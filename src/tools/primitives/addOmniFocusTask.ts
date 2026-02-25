@@ -98,7 +98,7 @@ ${datePreamble}
           -- Use inbox of the document
           set newTask to make new inbox task with properties {name:"${name}"}
         end if
-        
+
         -- Set task properties
         ${note ? `set note of newTask to "${note}"` : ''}
         ${params.dueDate ? `set due date of newTask to dueDateValue` : ''}
@@ -106,14 +106,14 @@ ${datePreamble}
         ${params.plannedDate ? `set planned date of newTask to plannedDateValue` : ''}
         ${flagged ? `set flagged of newTask to true` : ''}
         ${estimatedMinutes ? `set estimated minutes of newTask to ${estimatedMinutes}` : ''}
-        
+
         -- Get the task ID
         set taskId to id of newTask as string
         set taskNameValue to name of newTask
-        
+
         -- Add tags if provided
         ${tagAssignmentScript}
-        
+
         -- Return success with task ID
         return "{\\\"success\\\":true,\\\"taskId\\\":\\"" & my jsonEscape(taskId) & "\\",\\\"name\\\":\\"" & my jsonEscape(taskNameValue) & "\\\"}"
       end tell
@@ -199,4 +199,4 @@ export async function addOmniFocusTask(params: AddOmniFocusTaskParams): Promise<
       error: error?.message || "Unknown error in addOmniFocusTask"
     };
   }
-} 
+}
