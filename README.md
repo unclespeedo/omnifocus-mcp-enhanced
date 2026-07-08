@@ -44,6 +44,7 @@ Want to see where the project is heading next? See the [roadmap](docs/roadmap/20
 
 ## 🆕 Latest Release
 
+- **v1.6.11** - Security/dependency refresh: upgraded MCP SDK to 1.29 (resolves all npm audit advisories), fixed a TypeScript build OOM via NodeNext module resolution, translated all tool output and descriptions to English, fixed `get_today_completed_tasks` emitting literal `\n` text, migrated to `registerTool`, removed dead debug scripts, and cut the npm package from 2.1 MB to ~300 kB. Added `npm run smoke` for live verification.
 - **v1.6.10** - Fixed Inbox task completion via `edit_item`, fixed AppleScript special-character handling for apostrophes/backslashes, fixed JSON result escaping for special characters, and clarified `batch_add_items` / `mcporter` usage with working examples.
 - **v1.6.9** - Added task attachment support: `get_task_by_id` now lists attachment metadata, `dump_database` exports attachment/link metadata, and new `read_task_attachment` returns image attachments as MCP image content when possible.
 - **v1.6.8** - Added stable task move support via `move_task` and `edit_item` (`newProjectId/newProjectName/newParentTaskId/newParentTaskName/moveToInbox`) with duplicate-name protection and cycle-prevention checks.

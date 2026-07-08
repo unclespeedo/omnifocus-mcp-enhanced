@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { randomUUID } from 'crypto';
 import { writeFileSync, unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -15,14 +16,14 @@ const execAsync = promisify(exec);
  * This avoids shell escaping issues with quotes and special characters
  */
 export async function executeAppleScript(script: string): Promise<string> {
-  const tempFile = join(tmpdir(), `applescript_${Date.now()}.scpt`);
+  const tempFile = join(tmpdir(), `applescript_${randomUUID()}.scpt`);
 
   try {
     // Write the script to a temporary file
     writeFileSync(tempFile, script);
 
     // Execute using osascript with the file path (no shell escaping needed)
-    const { stdout, stderr } = await execAsync(`osascript ${tempFile}`);
+    const { stdout, stderr } = await execAsync(`osascript "${tempFile}"`);
 
     if (stderr) {
       console.error("AppleScript stderr:", stderr);
@@ -43,13 +44,13 @@ export async function executeAppleScript(script: string): Promise<string> {
 export async function executeJXA(script: string): Promise<any[]> {
   try {
     // Write the script to a temporary file in the system temp directory
-    const tempFile = join(tmpdir(), `jxa_script_${Date.now()}.js`);
+    const tempFile = join(tmpdir(), `jxa_script_${randomUUID()}.js`);
     
     // Write the script to the temporary file
     writeFileSync(tempFile, script);
     
     // Execute the script using osascript
-    const { stdout, stderr } = await execAsync(`osascript -l JavaScript ${tempFile}`);
+    const { stdout, stderr } = await execAsync(`osascript -l JavaScript "${tempFile}"`);
     
     if (stderr) {
       console.error("Script stderr output:", stderr);
@@ -124,36 +125,6 @@ export async function executeOmniFocusScript(scriptPath: string, args?: any): Pr
     const exactMatch = injectedArgs.exactMatch !== undefined ? injectedArgs.exactMatch : false;
     `;
       
-      // Replace any hardcoded parameters in the script with injected ones
-      scriptContent = scriptContent.replace(
-        /let perspectiveName = null;/,
-        'let perspectiveName = injectedArgs.perspectiveName || null;'
-      );
-      scriptContent = scriptContent.replace(
-        /let perspectiveId = null;/,
-        'let perspectiveId = injectedArgs.perspectiveId || null;'
-      );
-      scriptContent = scriptContent.replace(
-        /let hideCompleted = true;/,
-        'let hideCompleted = injectedArgs.hideCompleted !== undefined ? injectedArgs.hideCompleted : true;'
-      );
-      scriptContent = scriptContent.replace(
-        /let limit = 100;/,
-        'let limit = injectedArgs.limit || 100;'
-      );
-      scriptContent = scriptContent.replace(
-        /let includeBuiltIn = false;/,
-        'let includeBuiltIn = injectedArgs.includeBuiltIn !== undefined ? injectedArgs.includeBuiltIn : false;'
-      );
-      scriptContent = scriptContent.replace(
-        /let includeSidebar = true;/,
-        'let includeSidebar = injectedArgs.includeSidebar !== undefined ? injectedArgs.includeSidebar : true;'
-      );
-      scriptContent = scriptContent.replace(
-        /let format = "detailed";/,
-        'let format = injectedArgs.format || "detailed";'
-      );
-      
       // Inject the parameters at the beginning of the function
       scriptContent = scriptContent.replace(
         '(() => {',
@@ -163,7 +134,7 @@ export async function executeOmniFocusScript(scriptPath: string, args?: any): Pr
     }
     
     // Create a temporary file for our JXA wrapper script
-    const tempFile = join(tmpdir(), `jxa_wrapper_${Date.now()}.js`);
+    const tempFile = join(tmpdir(), `jxa_wrapper_${randomUUID()}.js`);
     
     // Create a JXA script that will execute our OmniJS script in OmniFocus
     // Use JSON.stringify to safely embed the script content — avoids escaping issues
@@ -190,7 +161,7 @@ export async function executeOmniFocusScript(scriptPath: string, args?: any): Pr
     
     // Execute the JXA script using osascript
     // Increase maxBuffer to support large OmniFocus databases (1000+ tasks)
-    const { stdout, stderr } = await execAsync(`osascript -l JavaScript ${tempFile}`, { maxBuffer: 10 * 1024 * 1024 });
+    const { stdout, stderr } = await execAsync(`osascript -l JavaScript "${tempFile}"`, { maxBuffer: 10 * 1024 * 1024 });
 
     // Clean up the temporary file
     unlinkSync(tempFile);
