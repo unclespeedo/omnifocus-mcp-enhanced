@@ -3,17 +3,32 @@
 // lists tools, and calls a few read-only tools against the live OmniFocus DB.
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
+import { fileURLToPath } from 'node:url';
 
-const server = spawn('node', ['dist/server.js'], { stdio: ['pipe', 'pipe', 'inherit'] });
+const serverPath = fileURLToPath(new URL('../dist/server.js', import.meta.url));
+const server = spawn('node', [serverPath], { stdio: ['pipe', 'pipe', 'inherit'] });
 const rl = createInterface({ input: server.stdout });
 const pending = new Map();
 let nextId = 1;
 
+function rejectAllPending(err) {
+  for (const [, entry] of pending) entry.reject(err);
+  pending.clear();
+}
+
+server.on('error', (err) => rejectAllPending(new Error(`server spawn failed: ${err.message}`)));
+server.on('exit', (code, signal) => {
+  if (pending.size > 0) {
+    rejectAllPending(new Error(`server exited early (code ${code}, signal ${signal})`));
+  }
+});
+server.stdin.on('error', () => {}); // EPIPE after child death; exit handler reports it
+
 rl.on('line', (line) => {
   let msg;
   try { msg = JSON.parse(line); } catch { return; }
-  if (msg.id && pending.has(msg.id)) {
-    pending.get(msg.id)(msg);
+  if (msg.id && msg.method === undefined && pending.has(msg.id)) {
+    pending.get(msg.id).resolve(msg);
     pending.delete(msg.id);
   }
 });
@@ -22,8 +37,14 @@ function rpc(method, params, timeoutMs = 30000) {
   const id = nextId++;
   server.stdin.write(JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n');
   return new Promise((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error(`timeout: ${method}`)), timeoutMs);
-    pending.set(id, (msg) => { clearTimeout(t); resolve(msg); });
+    const t = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`timeout: ${method}`));
+    }, timeoutMs);
+    pending.set(id, {
+      resolve: (msg) => { clearTimeout(t); resolve(msg); },
+      reject: (err) => { clearTimeout(t); reject(err); },
+    });
   });
 }
 
@@ -57,7 +78,11 @@ try {
     ['filter_tasks', { flagged: true }],
   ];
   for (const [name, args] of readOnlyCalls) {
-    if (!tools.includes(name)) { console.log(`SKIP  ${name}: not registered`); continue; }
+    if (!tools.includes(name)) {
+      failed++;
+      console.log(`FAIL  ${name}: not registered`);
+      continue;
+    }
     const msg = await rpc('tools/call', { name, arguments: args }, 60000);
     const line = summarize(name, msg);
     if (line.startsWith('FAIL')) failed++;
@@ -73,7 +98,7 @@ try {
     console.log('PASS  move_task validation: rejected conflicting destinations');
   } else {
     failed++;
-    console.log(`FAIL  move_task validation: ${JSON.stringify(bad.result).slice(0, 200)}`);
+    console.log(`FAIL  move_task validation: ${JSON.stringify(bad.result ?? bad.error).slice(0, 200)}`);
   }
 } catch (err) {
   failed++;

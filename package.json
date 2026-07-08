@@ -8,16 +8,16 @@
     "omnifocus-mcp-enhanced": "cli.cjs"
   },
   "scripts": {
-    "build": "tsc && npm run copy-files && chmod 755 dist/server.js",
+    "build": "rm -rf dist && tsc && npm run copy-files && chmod 755 dist/server.js",
     "copy-files": "mkdir -p dist/utils/omnifocusScripts && cp src/utils/omnifocusScripts/*.js dist/utils/omnifocusScripts/",
     "start": "node dist/server.js",
     "dev": "tsc -w",
     "prepublishOnly": "npm run build",
     "test": "echo \"Test passed - manual testing required with OmniFocus\"",
-    "smoke": "npm run build && node --test dist/tools/definitions/*.test.js && node scripts/smoke-test.mjs"
+    "smoke": "npm run build && find dist -name '*.test.js' | grep -q . && node --test 'dist/**/*.test.js' && node scripts/smoke-test.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.8.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

@@ -2,6 +2,9 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { createRequire } from 'node:module';
+
+const { version } = createRequire(import.meta.url)('../package.json');
 
 // Import tool definitions
 import * as dumpDatabaseTool from './tools/definitions/dumpDatabase.js';
@@ -29,7 +32,7 @@ import * as getCustomPerspectiveTasksTool from './tools/definitions/getCustomPer
 // Create an MCP server
 const server = new McpServer({
   name: "OmniFocus MCP",
-  version: "1.6.9"
+  version
 });
 
 // Register tools
