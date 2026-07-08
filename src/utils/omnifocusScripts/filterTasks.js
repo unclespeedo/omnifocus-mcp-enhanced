@@ -1,7 +1,7 @@
-// 修复版本的 filter_tasks
+// Fixed version of filter_tasks
 (() => {
   try {
-    // 获取参数
+    // Get parameters
     const args = typeof injectedArgs !== 'undefined' ? injectedArgs : {};
     
     const filters = {
@@ -9,7 +9,7 @@
       perspective: args.perspective || "all", 
       flagged: args.flagged !== undefined ? args.flagged : null,
       
-      // 完成日期过滤器
+      // Completion date filters
       completedToday: args.completedToday || false,
       completedYesterday: args.completedYesterday || false,
       completedThisWeek: args.completedThisWeek || false,
@@ -33,7 +33,7 @@
       sortOrder: args.sortOrder || "asc"
     };
     
-    // 辅助函数
+    // Helper functions
     function getTaskStatus(status) {
       const taskStatusMap = {
         [Task.Status.Available]: "Available",
@@ -94,17 +94,17 @@
       return checkDate.getFullYear() === now.getFullYear() && checkDate.getMonth() === now.getMonth();
     }
     
-    // 获取所有任务
+    // Get all tasks
     const allTasks = flattenedTasks;
-    
-    // 判断是否需要包含完成的任务
+
+    // Determine whether completed tasks need to be included
     const wantsCompletedTasks = filters.completedToday || filters.completedYesterday || 
                                filters.completedThisWeek || filters.completedThisMonth || 
                                filters.completedBefore || filters.completedAfter;
     const includeCompletedByStatus = filters.taskStatus && 
       (filters.taskStatus.includes("Completed") || filters.taskStatus.includes("Dropped"));
     
-    // 选择任务集
+    // Select the task set
     let availableTasks;
     if (wantsCompletedTasks || includeCompletedByStatus) {
       availableTasks = allTasks;
@@ -115,7 +115,7 @@
       );
     }
     
-    // 应用透视过滤
+    // Apply perspective filtering
     let baseTasks = [];
     switch (filters.perspective) {
       case "inbox":
@@ -129,37 +129,37 @@
         break;
     }
     
-    // 应用所有过滤器
+    // Apply all filters
     let filteredTasks = baseTasks.filter(task => {
       try {
         const taskStatus = getTaskStatus(task.taskStatus);
         
-        // 完成任务逻辑
+        // Completed task logic
         if (wantsCompletedTasks) {
-          // 只要完成任务
+          // Only include completed tasks
           if (taskStatus !== "Completed") {
             return false;
           }
         } else {
-          // 排除完成任务（除非明确指定状态）
+          // Exclude completed tasks (unless a status is explicitly specified)
           if (!includeCompletedByStatus && (taskStatus === "Completed" || taskStatus === "Dropped")) {
             return false;
           }
         }
         
-        // 状态过滤
+        // Status filtering
         if (filters.taskStatus && filters.taskStatus.length > 0) {
           if (!filters.taskStatus.includes(taskStatus)) {
             return false;
           }
         }
         
-        // 标记过滤
+        // Flag filtering
         if (filters.flagged !== null && task.flagged !== filters.flagged) {
           return false;
         }
         
-        // 项目过滤
+        // Project filtering
         if (filters.projectFilter) {
           const projectName = task.containingProject ? task.containingProject.name : '';
           if (!projectName.toLowerCase().includes(filters.projectFilter.toLowerCase())) {
@@ -167,7 +167,7 @@
           }
         }
         
-        // 搜索文本过滤
+        // Search text filtering
         if (filters.searchText) {
           const searchLower = filters.searchText.toLowerCase();
           const taskName = (task.name || '').toLowerCase();
@@ -245,7 +245,7 @@
       }
     });
     
-    // 排序
+    // Sorting
     if (filters.sortBy === "completedDate") {
       filteredTasks.sort((a, b) => {
         const dateA = a.completionDate || new Date('1900-01-01');
@@ -262,12 +262,12 @@
       });
     }
     
-    // 限制结果数量
+    // Limit the number of results
     if (filters.limit && filteredTasks.length > filters.limit) {
       filteredTasks = filteredTasks.slice(0, filters.limit);
     }
     
-    // 构建返回数据
+    // Build the return data
     const exportData = {
       exportDate: new Date().toISOString(),
       tasks: [],
@@ -277,7 +277,7 @@
       sortOrder: filters.sortOrder
     };
     
-    // 处理每个任务
+    // Process each task
     filteredTasks.forEach(task => {
       try {
         const taskData = {
@@ -302,7 +302,7 @@
         
         exportData.tasks.push(taskData);
       } catch (taskError) {
-        // 跳过处理错误的任务
+        // Skip tasks that fail to process
       }
     });
     

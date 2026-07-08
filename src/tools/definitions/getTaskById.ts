@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { getTaskById, GetTaskByIdParams } from '../primitives/getTaskById.js';
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import { formatAttachmentSize } from '../primitives/taskAttachments.js';
 
 export const schema = z.object({
@@ -50,7 +49,7 @@ export function formatTaskInfo(task: Awaited<ReturnType<typeof getTaskById>> ext
   return infoText;
 }
 
-export async function handler(args: z.infer<typeof schema>, extra: RequestHandlerExtra) {
+export async function handler(args: z.infer<typeof schema>) {
   try {
     // Validate that either taskId or taskName is provided
     if (!args.taskId && !args.taskName) {

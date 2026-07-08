@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import { moveTask, MoveTaskParams } from '../primitives/moveTask.js';
 
 export const schema = z.object({
@@ -28,7 +27,7 @@ function formatDestination(args: z.infer<typeof schema>): string {
   return 'destination';
 }
 
-export async function handler(args: z.infer<typeof schema>, extra: RequestHandlerExtra) {
+export async function handler(args: z.infer<typeof schema>) {
   try {
     const result = await moveTask(args as MoveTaskParams);
 
