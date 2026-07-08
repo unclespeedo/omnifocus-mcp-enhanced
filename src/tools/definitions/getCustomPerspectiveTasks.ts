@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { getCustomPerspectiveTasks } from '../primitives/getCustomPerspectiveTasks.js';
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import { PerspectiveDisplayMode } from '../primitives/perspectiveTaskTree.js';
 
 export const schema = z.object({
@@ -28,7 +27,7 @@ export function resolveCustomPerspectiveDisplayMode(args: Partial<z.infer<typeof
   return 'project_tree';
 }
 
-export async function handler(args: z.infer<typeof schema>, extra: RequestHandlerExtra) {
+export async function handler(args: z.infer<typeof schema>) {
   try {
     const result = await getCustomPerspectiveTasks({
       perspectiveName: args.perspectiveName,

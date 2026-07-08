@@ -1,4 +1,3 @@
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import { z } from 'zod';
 
 import { readTaskAttachment, ReadTaskAttachmentResult, validateReadTaskAttachmentParams } from '../primitives/readTaskAttachment.js';
@@ -59,7 +58,7 @@ export function buildAttachmentContentResponse(result: {
   return { content };
 }
 
-export async function handler(args: z.infer<typeof schema>, extra: RequestHandlerExtra) {
+export async function handler(args: z.infer<typeof schema>) {
   const validation = validateReadTaskAttachmentParams(args);
   if (!validation.valid) {
     return {

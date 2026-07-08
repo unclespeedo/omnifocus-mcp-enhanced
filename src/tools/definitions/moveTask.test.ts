@@ -26,7 +26,7 @@ test('move_task handler returns validation errors for conflicting destinations',
     id: 'task-1',
     targetProjectId: 'project-1',
     targetInbox: true
-  }, {} as any);
+  });
 
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /Exactly one destination/);
