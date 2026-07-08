@@ -17,7 +17,15 @@
       completedBefore: args.completedBefore || null,
       completedAfter: args.completedAfter || null,
       
-      // 其他过滤器
+      // Due date filters
+      dueToday: args.dueToday || false,
+      dueThisWeek: args.dueThisWeek || false,
+      dueThisMonth: args.dueThisMonth || false,
+      overdue: args.overdue || false,
+      dueBefore: args.dueBefore || null,
+      dueAfter: args.dueAfter || null,
+
+      // Other filters
       projectFilter: args.projectFilter || null,
       searchText: args.searchText || null,
       limit: args.limit || 100,
@@ -63,6 +71,27 @@
       today.setDate(yesterday.getDate() + 1);
       const checkDate = new Date(date);
       return checkDate >= yesterday && checkDate < today;
+    }
+
+    function isThisWeek(date) {
+      if (!date) return false;
+      const now = new Date();
+      const currentDay = now.getDay(); // Sunday = 0
+      const mondayOffset = (currentDay + 6) % 7;
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - mondayOffset);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+      const checkDate = new Date(date);
+      return checkDate >= weekStart && checkDate < weekEnd;
+    }
+
+    function isThisMonth(date) {
+      if (!date) return false;
+      const now = new Date();
+      const checkDate = new Date(date);
+      return checkDate.getFullYear() === now.getFullYear() && checkDate.getMonth() === now.getMonth();
     }
     
     // 获取所有任务
@@ -148,7 +177,51 @@
           }
         }
         
-        // 完成日期过滤
+        // Due date filtering
+        if (filters.dueToday) {
+          if (!task.dueDate || !isToday(task.dueDate)) {
+            return false;
+          }
+        }
+        if (filters.dueThisWeek) {
+          if (!task.dueDate || !isThisWeek(task.dueDate)) {
+            return false;
+          }
+        }
+        if (filters.dueThisMonth) {
+          if (!task.dueDate || !isThisMonth(task.dueDate)) {
+            return false;
+          }
+        }
+        if (filters.overdue) {
+          if (!task.dueDate) {
+            return false;
+          }
+          const dueDate = new Date(task.dueDate);
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+          if (dueDate >= now) {
+            return false;
+          }
+        }
+        if (filters.dueBefore) {
+          if (!task.dueDate) {
+            return false;
+          }
+          if (new Date(task.dueDate) >= new Date(filters.dueBefore)) {
+            return false;
+          }
+        }
+        if (filters.dueAfter) {
+          if (!task.dueDate) {
+            return false;
+          }
+          if (new Date(task.dueDate) <= new Date(filters.dueAfter)) {
+            return false;
+          }
+        }
+
+        // Completion date filtering
         if (wantsCompletedTasks) {
           if (filters.completedToday && !isToday(task.completionDate)) {
             return false;
