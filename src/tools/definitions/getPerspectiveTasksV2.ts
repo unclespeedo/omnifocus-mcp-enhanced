@@ -9,7 +9,7 @@ import { getPerspectiveTasksV2 } from '../primitives/getPerspectiveTasksV2.js';
 // - No manual filter configuration required
 
 export const schema = z.object({
-  perspectiveName: z.string().describe("Perspective name. Use the name of a custom perspective you created in OmniFocus, e.g. 'Today Plan' or 'Weekly Review'"),
+  perspectiveName: z.string().describe("Perspective name. Use the name of a custom perspective you created in OmniFocus, e.g. 'Today's Plan' or 'Daily Review'"),
 
   hideCompleted: z.boolean().optional().default(true).describe("Whether to hide completed and dropped tasks (default: true)"),
 

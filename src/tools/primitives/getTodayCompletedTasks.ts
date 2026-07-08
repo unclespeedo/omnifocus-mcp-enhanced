@@ -23,12 +23,12 @@ export async function getTodayCompletedTasks(options: GetTodayCompletedTasksOpti
       }
 
       // Format the completed tasks result
-      let output = `# ✅ Tasks Completed Today\\n\\n`;
+      let output = `# ✅ Tasks Completed Today\n\n`;
 
       if (data.tasks && Array.isArray(data.tasks)) {
         if (data.tasks.length === 0) {
-          output += "🎯 No tasks completed yet today.\\n";
-          output += "\\n**Keep going!** Complete some tasks to fill up this list!\\n";
+          output += "🎯 No tasks completed yet today.\n";
+          output += "\n**Keep going!** Complete some tasks to fill up this list!\n";
         } else {
           const taskCount = data.tasks.length;
           const totalCount = data.filteredCount || taskCount;
@@ -37,32 +37,32 @@ export async function getTodayCompletedTasks(options: GetTodayCompletedTasksOpti
           if (taskCount < totalCount) {
             output += ` (showing first ${taskCount})`;
           }
-          output += `:\\n\\n`;
+          output += `:\n\n`;
 
           // Group tasks by project for display
           const tasksByProject = groupTasksByProject(data.tasks);
 
           tasksByProject.forEach((tasks, projectName) => {
             if (tasksByProject.size > 1) {
-              output += `## 📁 ${projectName}\\n`;
+              output += `## 📁 ${projectName}\n`;
             }
 
             tasks.forEach((task: any) => {
               output += formatCompletedTask(task);
-              output += '\\n';
+              output += '\n';
             });
 
             if (tasksByProject.size > 1) {
-              output += '\\n';
+              output += '\n';
             }
           });
 
           // Show summary
-          output += `\\n---\\n📊 **Today's Completion Summary**: ${totalCount} tasks completed\\n`;
-          output += `📅 **Queried at**: ${new Date().toLocaleString()}\\n`;
+          output += `\n---\n📊 **Today's Completion Summary**: ${totalCount} tasks completed\n`;
+          output += `📅 **Queried at**: ${new Date().toLocaleString()}\n`;
         }
       } else {
-        output += "No task data available\\n";
+        output += "No task data available\n";
       }
 
       return output;
@@ -127,17 +127,17 @@ function formatCompletedTask(task: any): string {
     output += ` (${additionalInfo.join(', ')})`;
   }
 
-  output += '\\n';
+  output += '\n';
 
   // Task note
   if (task.note && task.note.trim()) {
-    output += `  📝 ${task.note.trim()}\\n`;
+    output += `  📝 ${task.note.trim()}\n`;
   }
 
   // Tags
   if (task.tags && task.tags.length > 0) {
     const tagNames = task.tags.map((tag: any) => tag.name).join(', ');
-    output += `  🏷 ${tagNames}\\n`;
+    output += `  🏷 ${tagNames}\n`;
   }
 
   return output;

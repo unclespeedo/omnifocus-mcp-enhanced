@@ -278,21 +278,13 @@ export class PerspectiveEngine {
           console.log("Perspective name:", "${perspectiveName}");
           console.log("Total task count:", tasks.length);
 
-          // For "Daily Review", we should fetch completed tasks
           var maxTasks = Math.min(50, tasks.length);
           var foundCount = 0;
 
           for (var i = 0; i < maxTasks && foundCount < 15; i++) {
             var task = tasks[i];
 
-            // Simple filter logic: for "Daily Review", fetch completed tasks
-            var shouldInclude = false;
-            if ("${perspectiveName}" === "Daily Review") {
-              shouldInclude = task.completed();
-            } else {
-              // Other perspectives default to incomplete tasks
-              shouldInclude = !task.completed() && !task.dropped();
-            }
+            var shouldInclude = !task.completed() && !task.dropped();
 
             if (shouldInclude) {
               var taskInfo = {
