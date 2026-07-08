@@ -196,7 +196,7 @@ export class PerspectiveEngine {
           // Find the perspective with the given name
           for (var i = 0; i < perspectives.length; i++) {
             var perspective = perspectives[i];
-            if (perspective.name() === "${perspectiveName}") {
+            if (perspective.name() === ${JSON.stringify(perspectiveName)}) {
               targetPerspective = perspective;
               break;
             }
@@ -275,7 +275,7 @@ export class PerspectiveEngine {
           var tasks = doc.flattenedTasks;
           var result = [];
 
-          console.log("Perspective name:", "${perspectiveName}");
+          console.log("Perspective name:", ${JSON.stringify(perspectiveName)});
           console.log("Total task count:", tasks.length);
 
           var maxTasks = Math.min(50, tasks.length);

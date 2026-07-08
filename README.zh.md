@@ -40,6 +40,7 @@ OmniFocus 本身已经很强了，但它大多数时候仍然是一个需要你�
 
 ## 🆕 最新版本
 
+- **v1.6.11** - 安全与依赖更新：升级 MCP SDK 至 1.29（修复全部 npm audit 安全公告），通过 NodeNext 模块解析修复 TypeScript 构建内存溢出，工具输出与描述改为英文，修复 `get_today_completed_tasks` 输出字面 `\n` 文本的问题，迁移到 `registerTool`，移除无用调试脚本，npm 包体积从 2.1 MB 减至约 300 kB，新增 `npm run smoke` 实时验证命令。
 - **v1.6.10** - 修复 `edit_item` 无法完成 Inbox 任务的问题，修复 AppleScript 对单引号/反斜杠等特殊字符的处理，修复特殊字符导致的 JSON 返回解析失败，并补充 `batch_add_items` / `mcporter` 的可直接运行示例与说明。
 - **v1.6.9** - 新增任务附件支持：`get_task_by_id` 会返回附件元信息，`dump_database` 导出附件/链接元信息，并新增 `read_task_attachment`，可在支持时直接把图片附件作为 MCP 图片内容返回。
 - **v1.6.6** - 新增 Planned Date（计划日期）全链路支持：创建/编辑/读取/过滤/排序/导出，包含 `plannedDate` / `newPlannedDate`。
